@@ -72,7 +72,28 @@ def generate_ssh_key_pair(key_size=2048, passphrase=None):
     )
     
     
-    #print(private_key_pem)
+
     return public_key_pem.decode("utf-8"), private_key_pem.decode("utf-8")
 
-generate_ssh_key_pair()
+###DETERMINE LE USER SI IL N'A PAS ETE RENSEIGÉ
+def search_username(os_instance):
+     if os_instance.count('Debian') == 1:
+           return "admin"        
+     elif os_instance.count('Ubuntu') == 1:
+           return "ubuntu"
+     elif os_instance.count('Bitnami') == 1:
+           return "bitnami"
+     elif os_instance.count('Oracle') == 1:
+           return "ec2-user"
+     elif os_instance.count('SUSE') == 1:
+           return "root"
+     elif os_instance.count('RHEL') == 1:
+           return "root"
+     elif os_instance.count('Fedora') == 1:
+           return "fedora"
+     elif os_instance.count('Amazon Linux') == 1:
+         return "ec2-user"
+     elif os_instance.count('CentOS') == 1:
+           return "centos"
+     else:
+           exit()
