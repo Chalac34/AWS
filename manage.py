@@ -78,31 +78,39 @@ def distribute(instance_id,ssh_key,username=""):
      ip_pub_instance=get_ipv4_pub(instance_id)
      os_instance=get_distib(instance_id)
      username =search_username(os_instance)
-
-
+     
      client = paramiko.client.SSHClient()
      client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
      client.connect(ip_pub_instance, username=username,  key_filename=SSH_KEY)
-     _stdin, _stdout,_stderr = client.exec_command(f"echo '{ssh_key} {username}' >> {SSH_FILE_LINUX}")
-     #print(_stdout.read().decode())
-     client.close()
-     print("clé ssh attribué")
+     ssh_key_without_rsa=ssh_key.replace("ssh-rsa","")
+     _stdin, _stdout,_stderr = client.exec_command(f'grep -n {SSH_FILE_LINUX} -e {ssh_key_without_rsa}')
+     
+     if (_stdout.read().decode()) == "" :
+          _stdin, _stdout,_stderr = client.exec_command(f"echo '{ssh_key} {username}' >> {SSH_FILE_LINUX}")
+     
+          client.close()
+          print("clé ssh attribué")
+     else:
+           client.close()
+           print("clé déja attribué a cette machine")
 
 
-###PAS FINI
+###gerer si clé en plusieur exemplaire
 def revoke_key(instance_id,ssh_key,username=""):
       ip_pub_instance=get_ipv4_pub(instance_id)
       os_instance=get_distib(instance_id)
       username =search_username(os_instance)
+      #commentaire=input("propriétaire de la clé: ")
+      
+      ssh_key=ssh_key.replace("ssh-rsa","")
 
       client = paramiko.client.SSHClient()
       client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
       client.connect(ip_pub_instance, username=username,  key_filename=SSH_KEY)
-      #_stdin, _stdout,_stderr = client.exec_command(f'grep -n {SSH_FILE_LINUX} -e {ssh_key} | grep -o "^." | sed -i $(</dev/stdin)d {SSH_FILE_LINUX}')
-      _stdin, _stdout,_stderr = client.exec_command(f'grep -n test.txt -e {ssh_key}')
-      #_stdin, _stdout,_stderr = client.exec_command(f'ls -asl ')
-      #_stdin, _stdout,_stderr = client.exec_command(f'grep -n tryme.txt -e {ssh_key} | grep -n -o ".................$" ')
-      print(_stdout.read().decode())
+      _stdin, _stdout,_stderr = client.exec_command(f'grep -n {SSH_FILE_LINUX} -e {ssh_key}')
+      print((_stdout.read().decode()).split("\n"))
+      _stdin, _stdout,_stderr = client.exec_command(f'grep -n {SSH_FILE_LINUX} -e {ssh_key} | grep -o "^." | sed -i $(</dev/stdin)d {SSH_FILE_LINUX}')
+      
       #sortie=_stdout.read().decode()
      #  sortie=sortie.split('.ssh/authorized_keys:')#[4]== ssh_key 
      #  for i in sortie:
