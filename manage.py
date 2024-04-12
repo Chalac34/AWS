@@ -11,10 +11,6 @@ from tools import (generer_chaine,
                    search_username,
                    delete_key_on_AWS)
 
-hostname="13.37.213.89"
-username="admin"
-
-
 
 def generate():
      client = boto3.client(
