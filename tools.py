@@ -77,6 +77,11 @@ def generate_ssh_key_pair(key_size=2048, passphrase=None):
 
 ###DETERMINE LE USER SI IL N'A PAS ETE RENSEIGÉ
 def search_username(os_instance):
+     
+     
+
+     
+     
      if os_instance.count('Debian') == 1:
            return "admin"        
      elif os_instance.count('Ubuntu') == 1:
@@ -97,3 +102,16 @@ def search_username(os_instance):
            return "centos"
      else:
            exit()
+
+def delete_key_on_AWS(name_of_key):
+    client = boto3.client(
+               'ssm',
+               aws_access_key_id=AWS_ACCES_KEY,
+               aws_secret_access_key=AWS_SECRET_KEY,
+               region_name=REGION
+               )
+    response = client.delete_parameter(
+        Name=name_of_key
+        )
+    print(response)
+     
